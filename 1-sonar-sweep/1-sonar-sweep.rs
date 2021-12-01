@@ -3,8 +3,14 @@ use std::io::{BufRead, BufReader};
 
 fn calculate_larger_depths(input: Vec<usize>) -> usize {
     let mut larger_depths = 0;
-    let mut previous = input[0];
-    for depth in input {
+    let mut previous = input[0] + input[1] + input[2];
+    let len = input.len();
+    for i in 0..len {
+        if i + 3 > len {
+            break;
+        }
+
+        let depth = input[i] + input[i + 1] + input[i + 2];
         if depth > previous {
             larger_depths += 1;
         }
