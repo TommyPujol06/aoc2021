@@ -6,13 +6,17 @@ fn abs(n: isize) -> isize {
     }
 }
 
+fn binomial_coef(n: isize) -> isize {
+    n * (n + 1) / 2
+}
+
 fn calculate_cheapest_move(input: Vec<isize>) -> isize {
     let mut costs: Vec<isize> = Vec::new();
     let max_pos = input.iter().max().unwrap();
     for pos in 0..max_pos + 1 {
         let mut total_fuel = 0;
         for i in input.iter() {
-            total_fuel += abs(i - pos);
+            total_fuel += binomial_coef(abs(i - pos));
         }
         costs.push(total_fuel);
     }
@@ -27,5 +31,5 @@ fn main() {
         .map(|x| x.to_string().parse::<isize>().unwrap())
         .collect();
 
-    println!("p1: {}", calculate_cheapest_move(input));
+    println!("p2: {}", calculate_cheapest_move(input));
 }
