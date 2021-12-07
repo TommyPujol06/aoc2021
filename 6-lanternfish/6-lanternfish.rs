@@ -1,40 +1,49 @@
-use std::cell::RefCell;
+use std::collections::BTreeMap;
 
-#[derive(Debug, Copy, Clone)]
-struct Fish {
-    age: u8,
-}
+fn fish_after_n_days(n: u16) -> u128 {
+    let mut fishes: BTreeMap<u8, u128> = BTreeMap::new();
 
-fn fish_after_n_days(n: u16) -> usize {
-    let mut fishes: Vec<RefCell<Fish>> = include_str!("6-lanternfish.txt")
+    for age in 0..9 {
+        fishes.insert(age, 0);
+    }
+
+    for age in include_str!("6-lanternfish.txt")
         .trim()
         .split(",")
         .filter(|s| !s.is_empty())
         .map(|s| s.to_string())
-        .map(|s| {
-            RefCell::new(Fish {
-                age: s.parse().unwrap(),
-            })
-        })
-        .collect();
-
-    for _ in 0..n {
-        let mut new_fishes = Vec::new();
-        for fish in fishes.iter_mut() {
-            if fish.borrow().age == 0 {
-                fish.borrow_mut().age = 6;
-                new_fishes.push(RefCell::new(Fish { age: 8 }));
-            } else {
-                fish.borrow_mut().age -= 1;
-            }
-        }
-        fishes.append(&mut new_fishes);
+    {
+        let age = age.parse::<u8>().unwrap();
+        *fishes.get_mut(&age).unwrap() += 1;
     }
 
-    fishes.len()
+    for _ in 0..n {
+        for (age, num_of_fish) in fishes.clone() {
+            if num_of_fish > 0 {
+                if age == 0 {
+                    *fishes.get_mut(&8).unwrap() += num_of_fish;
+                    *fishes.get_mut(&0).unwrap() -= num_of_fish;
+                    *fishes.get_mut(&6).unwrap() += num_of_fish;
+                } else {
+                    *fishes.get_mut(&age).unwrap() -= num_of_fish;
+                    *fishes.get_mut(&(age - 1)).unwrap() += num_of_fish;
+                }
+            }
+        }
+    }
+
+    let len = {
+        let mut len = 0;
+        for (_, v) in fishes.iter() {
+            len += v;
+        }
+        len
+    };
+
+    len
 }
 
 fn main() {
-    println!("pt1: {}", fish_after_n_days(89));
+    println!("pt1: {}", fish_after_n_days(80));
     println!("pt2: {}", fish_after_n_days(256));
 }
