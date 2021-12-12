@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-fn parse_coords(input: &Vec<String>) -> Vec<Vec<(u32, u32)>> {
+fn parse_coords(input: &Vec<String>) -> Vec<Vec<(i32, i32)>> {
     let mut coords = Vec::new();
 
     for line in input {
@@ -9,7 +9,7 @@ fn parse_coords(input: &Vec<String>) -> Vec<Vec<(u32, u32)>> {
             .map(|x| x.to_string())
             .collect::<Vec<String>>();
 
-        let mut segment_coords: Vec<(u32, u32)> = Vec::new();
+        let mut segment_coords: Vec<(i32, i32)> = Vec::new();
 
         for segment in segments {
             for tup in segment
@@ -30,7 +30,7 @@ fn parse_coords(input: &Vec<String>) -> Vec<Vec<(u32, u32)>> {
 }
 
 fn calculate_overlaps(input: Vec<String>) -> usize {
-    let mut grid: HashMap<(u32, u32), u32> = HashMap::new();
+    let mut grid: HashMap<(i32, i32), i32> = HashMap::new();
 
     let segments = parse_coords(&input);
     for segment in segments {
@@ -41,11 +41,26 @@ fn calculate_overlaps(input: Vec<String>) -> usize {
             for y in y1.min(y2)..=y2.max(y1) {
                 *grid.entry((x1, y)).or_insert(0) += 1;
             }
-        }
-
-        if y1 == y2 {
+        } else if y1 == y2 {
             for x in x1.min(x2)..=x2.max(x1) {
                 *grid.entry((x, y1)).or_insert(0) += 1;
+            }
+        } else {
+            let dx = if x1 < x2 { 1 } else { -1 };
+            let dy = if y1 < y2 { 1 } else { -1 };
+
+            let mut x = x1;
+            let mut y = y1;
+
+            loop {
+                *grid.entry((x, y)).or_insert(0) += 1;
+
+                if x == x2 && y == y2 {
+                    break;
+                }
+
+                x += dx;
+                y += dy;
             }
         }
     }
